@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Your custom ASCII Valentine’s artwork is ready! Download and share it with your loved ones.">
+    <meta property="og:image" content="https://yourdomain.com/generated-preview.png">
+    
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <title>Valentine's Artwork</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: black;
+            overflow-x: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100vw;
+        }
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        button, a {
+            padding: 10px;
+            font-size: 16px;
+            background: #ff4081;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="controls">
+        
+        <button onclick="downloadArtwork()">Download</button>
+        <button onclick="shareArtwork()"> Share</button>
+        <a href="index.html">Go Back</a>
+    </div>
+
+    <script>
+        window.onload = function () {
+            const params = new URLSearchParams(window.location.search);
+            const artworkId = params.get("id");
+
+            if (!artworkId) {
+                alert("No artwork found! Redirecting...");
+                window.location.href = "index.html";
+                return;
+            }
+
+            const artwork = JSON.parse(sessionStorage.getItem(`artwork_${artworkId}`));
+            if (!artwork) {
+                alert("Artwork not found!");
+                return;
+            }
+
+            generateArtwork(artwork.image, artwork.text);
+        };
+
+        function generateArtwork(imgSrc, text) {
+            if (!imgSrc) {
+                alert("No image found!");
+                return;
+            }
+
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
+            img.src = imgSrc;
+
+            img.onload = function () {
+                const aspectRatio = img.width / img.height;
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerWidth / aspectRatio;
+
+                if (canvas.height < window.innerHeight) {
+                    canvas.height = window.innerHeight;
+                }
+
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "black";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.font = "10px Arial";
+                ctx.textAlign = "center";
+
+                let index = 0;
+                for (let y = 0; y < canvas.height; y += 6) {
+                    for (let x = 0; x < canvas.width; x += 6) {
+                        const i = (y * canvas.width + x) * 4;
+                        const brightness = (imgData.data[i] + imgData.data[i + 1] + imgData.data[i + 2]) / 3;
+                        const opacity = brightness / 255;
+
+                        const char = text[index % text.length];
+                        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                        ctx.fillText(char, x, y);
+                        index++;
+                    }
+                }
+            };
+        }
+
+        function downloadArtwork() {
+            const canvas = document.getElementById("canvas");
+            const link = document.createElement("a");
+            link.download = "Thousand words picture.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        }
+
+        function shareArtwork() {
+            const url = `${window.location.origin}/art.html?id=${new Date().getTime()}`;
+            navigator.clipboard.writeText(url).then(() => {
+                alert("Shareable link copied to clipboard!");
+            });
+        }
+    </script>
+
+</body>
+</html>

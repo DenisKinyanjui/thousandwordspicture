@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Picture is Worth a Thousand Words</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            text-align: center;
+            background-color: #121212;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            background: linear-gradient(45deg, #ff4081, #6a11cb);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #ff4081; }
+            to { text-shadow: 0 0 20px #6a11cb; }
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: normal;
+            color: #b3b3b3;
+            margin-top: 5px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            width: 90%;
+            max-width: 500px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .container:hover {
+            transform: scale(1.02);
+        }
+
+        input, button {
+            padding: 12px;
+            width: 100%;
+            margin-top: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            transition: all 0.3s ease-in-out;
+        }
+
+        input {
+            background-color: #1e1e1e;
+            color: lightgray;
+            text-align: center;
+        }
+
+        input::placeholder {
+            color: #888;
+        }
+
+        input:hover, input:focus {
+            border-color: #ff4081;
+            outline: none;
+            box-shadow: 0px 0px 8px rgba(255, 64, 129, 0.5);
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff4081, #6a11cb);
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #6a11cb, #ff4081);
+            box-shadow: 0px 0px 10px rgba(255, 64, 129, 0.5);
+        }
+
+        .bluetech {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #b3b3b3;
+        }
+
+        .bluetech a {
+            color: #ff4081;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .bluetech a:hover {
+            color: #6a11cb;
+            text-shadow: 0px 0px 10px rgba(106, 17, 203, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>A Picture is Worth a Thousand Words</h1>
+    <h2>Turn your images into text-based artwork ❤️</h2>
+
+    <div class="container">
+        <input type="file" id="uploadImage" accept="image/*">
+        <input type="text" id="customText" placeholder="Enter your message">
+        <button onclick="generateAndProceed()">Generate</button>
+    </div>
+
+    <p class="bluetech">Developed by <a href="https://www.bluetech.co.ke" target="_blank">BlueTech</a></p>
+
+    <script>
+        function generateAndProceed() {
+            const fileInput = document.getElementById("uploadImage");
+            const textInput = document.getElementById("customText").value || "❤️";
+
+            if (!fileInput.files.length) {
+                alert("Please upload an image!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const imgData = event.target.result;
+                const artworkId = new Date().getTime();
+
+                sessionStorage.setItem(`artwork_${artworkId}`, JSON.stringify({ image: imgData, text: textInput }));
+
+                window.location.href = `art.html?id=${artworkId}`;
+            };
+
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+    </script>
+
+</body>
+</html>
